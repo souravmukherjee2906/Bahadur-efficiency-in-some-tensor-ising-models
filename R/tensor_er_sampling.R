@@ -1,11 +1,28 @@
-setwd("D:/R Code Data/Bahadur Simulations")
+#------------------------------------------------------------------------------------
+## Install the required packages into ##
+## R if it's not already installed.   ##
+#------------------------------------------------------------------------------------
+if(!require(ggplot2)) install.packages("ggplot2")
+if(!require(parallel)) install.packages("parallel")
+if(!require(doParallel)) install.packages("doParallel")
+if(!require(doSNOW)) install.packages("doSNOW")
+if(!require(doRNG)) install.packages("doRNG")
 
+
+#------------------------------------------------------------------------------------
+## Load the required packages into the R environment ##
+#------------------------------------------------------------------------------------
 library(ggplot2)
 library(parallel)
 library(doParallel)
 library(doSNOW)
 library(doRNG)
+
+
+#------------------------------------------------------------------------------------
+# Number of cores
 cores <- detectCores()
+
 
 #### Energy ####
 energy_matrix <- function(x, A, alpha, N){
@@ -21,6 +38,7 @@ energy_tensor <- function(x, A, p = 3){
   }
   return(2 * sum(A * X_tensor))
 }
+
 
 #### Generate the random ER tensor ####
 # alpha is edge probability
@@ -39,6 +57,7 @@ generate_tensor_A <- function(N, alpha, p = 3){
   }
   return(A_tensor)
 }
+
 
 #### Metropolis Hastings ####
 # Flip Probability for MH algorithm
@@ -88,11 +107,12 @@ MH_tensor <- function(iter, A, beta0){
   return(spins)
 }
 
+
 #### Generate Samples ####
 set.seed(123)
 beta0 <- 0.7
 alpha <- 0.25
-iter <- 40000#10000
+iter <- 40000
 n_samples <- 10000
 N_seq <- seq(150, 250, by = 10)
 for(j in N_seq){
@@ -104,14 +124,10 @@ for(j in N_seq){
   }
   cl <- makeCluster(cores - 2)
   registerDoSNOW(cl)
-  # pb <- txtProgressBar(max = n_samples, style = 3)
-  # progress <- function(n) setTxtProgressBar(pb, n)
-  # opts <- list(progress = progress)
   samples <- foreach(i = 1:n_samples) %dorng% {
     generate_spin(i)
   }
   saveRDS(samples, paste('beta_0.7_alpha_', as.character(alpha), '_N_', as.character(N), sep = ''))
-  # close(pb)
   stopCluster(cl)
 }
 
@@ -131,16 +147,13 @@ for(j in N_seq){
   }
   cl <- makeCluster(cores - 2)
   registerDoSNOW(cl)
-  # pb <- txtProgressBar(max = n_samples, style = 3)
-  # progress <- function(n) setTxtProgressBar(pb, n)
-  # opts <- list(progress = progress)
   samples <- foreach(i = 1:n_samples) %dorng% {
     generate_spin(i)
   }
   saveRDS(samples, paste('beta_0.9_alpha_', as.character(alpha), '_N_', as.character(N), sep = ''))
-  # close(pb)
   stopCluster(cl)
 }
+
 
 #### Find Optimal Sample Size from Theorem 1 for MPLE  ####
 # Calculate the MPLE given the average magnetization
@@ -179,6 +192,7 @@ par_find_N_mpl <- function(n_seq, reps, beta, beta0, p, alpha){
   return(l)
 }
 
+
 #### Plots ####
 # Plot 1
 delta <- 0.01
@@ -204,11 +218,16 @@ dfblack = data.frame("black_seq"=black_seq,"black_p_vals"=black_p_values)
 dfred = data.frame("red_seq"=red_seq,"black_p_vals"=red_p_values)
 
 pdf("mpleplot80_p2_null_above_log2_point70_delta_1_multiple_seed_123.pdf")
-ggplot()+geom_point(data=dfblack,aes(black_seq, black_p_values),col="black",shape=1)+geom_point(data=dfred,aes(red_seq, red_p_values),col="red",shape=2)+
-  labs(x = 'Sample Size', y = 'p-values', xlim = c(min(n_seq), max(n_seq)), ylim = c(min(p_values), max(p_values)))+geom_vline(xintercept = max(black_seq), col = 'blue')
+ggplot() +
+  geom_point(data=dfblack,aes(black_seq, black_p_values),col="black",shape=1) +
+  geom_point(data=dfred,aes(red_seq, red_p_values),col="red",shape=2) +
+  labs(x = 'Sample Size', y = 'p-values', xlim = c(min(n_seq), max(n_seq)), 
+       ylim = c(min(p_values), max(p_values)) ) +
+  geom_vline(xintercept = max(black_seq), col = 'blue')
+
 dev.off()
 
 print(paste('min_ML = ', round(min_ML, 3), ', min_MPL = ', round(min_MPL, 3), ', delta = ', delta,
             ', beta0 = ', beta0, ', beta = ', beta, ' p = ', p, ', blue line = ', max(black_seq)))
 
-#MLE
+
