@@ -230,7 +230,6 @@ ggplot() +
   labs(x = 'Sample Size', y = 'p-values', xlim = c(min(n_seq), max(n_seq)), 
        ylim = c(min(p_values), max(p_values)) ) +
   geom_vline(xintercept = max(black_seq), col = 'blue')
-
 dev.off()
 
 print(paste('min_ML = ', round(min_ML, 3), ', min_MPL = ', round(min_MPL, 3), ', delta = ', delta,
