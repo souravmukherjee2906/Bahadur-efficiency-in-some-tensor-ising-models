@@ -516,3 +516,5 @@ dev.off()
 
 print(paste('min_ML = ', round(min_ML, 3), ', min_MPL = ', round(min_MPL, 3), ', delta = ', delta,
             ', beta0 = ', beta0, ', beta = ', beta, ' p = ', p, ', blue line = ', max(black_seq)))
+
+
