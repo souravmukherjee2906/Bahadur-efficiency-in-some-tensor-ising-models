@@ -26,7 +26,7 @@ library(doRNG)
 
 
 #------------------------------------------------------------------------------------
-# Number of cores
+# Detect the Number of CPU Cores
 cores <- detectCores()
 
 
