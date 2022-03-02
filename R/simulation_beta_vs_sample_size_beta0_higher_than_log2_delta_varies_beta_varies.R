@@ -60,7 +60,8 @@ df = t(data.frame(bs))
 df = data.frame(cbind(df,beta1list))
 colnames(df) = c("p2","p3","p4","beta1")
 
-dfdelta = data.frame("delta"=seq(0.05,0.95,0.01), "sample_size_p2"=(df[1,1]/log(delta))*log(seq(0.05,0.95,0.01)),
+dfdelta = data.frame("delta"=seq(0.05,0.95,0.01), 
+                     "sample_size_p2"=(df[1,1]/log(delta))*log(seq(0.05,0.95,0.01)),
                      "sample_size_p3"=(df[1,2]/log(delta))*log(seq(0.05,0.95,0.01)),
                      "sample_size_p4"=(df[1,3]/log(delta))*log(seq(0.05,0.95,0.01)) )
 
